@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 import maplogic
 
 # configuration
@@ -15,17 +15,14 @@ def helloworld():
 
 
 # 热力图
-@app.route('/heatmap')
-def show_map():
+@app.route('/itemdist')
+def show_item_distribution():
     points = maplogic.get_shop_info()
-    return render_template('heatmap.html', points=points)
-
-
-# 聚点图
-@app.route('/dotmap')
-def show_dotmap():
-    points = maplogic.get_shop_info()
-    return render_template('dotmap.html', points=points)
+    mode = request.args.get('mode')
+    if mode == 'heat':
+        return render_template('heatmap.html', points=points)
+    else:
+        return render_template('dotmap.html', points=points)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
