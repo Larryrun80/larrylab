@@ -1,0 +1,4 @@
+*/__pycache__/
+*.conf
+*.yaml
+uwsgi_params
