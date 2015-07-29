@@ -1,63 +1,15 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="initial-scale=1.1,user-scalable=no">
-    <title>点聚合显示</title>
-    <style type="text/css">
-        body{
-            margin:0;
-            height:100%;
-            width:100%;
-            position:absolute;
-        }
-        #mapContainer{
-            position: absolute;
-            top:0;
-            left: 0;
-            right:0;
-            bottom:0;
-        }
-        #tip{
-            height:45px;
-            background-color:#fff;
-            padding-left:10px;
-            padding-right:10px;
-            border:1px solid #969696;
-            position:absolute;
-            font-size:12px;
-            right:10px;
-            bottom:30px;
-            border-radius:3px;
-            line-height:45px;
-        }
-        
-        #tip input[type='button']{
-            height:28px;
-            line-height:28px;
-            outline:none;
-            text-align:center;
-            padding-left:5px;
-            padding-right:5px;
-            color:#FFF;
-            background-color:#0D9BF2;
-            border:0;
-            border-radius: 3px;
-            margin-top:8px;
-            margin-left:5px;
-            cursor:pointer;
-            margin-right:10px;
-        }
-    </style>
-</head>
-<body>
+{% extends "layout.html" %}
+{% block title %}爱抢购分布_聚点图{% endblock %}
+{% block head %}
+    {{ super() }}
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='amap.css') }}">
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&    key=d7fbdb3c67451f5dcd7ca223a9e2f1f4"></script>
+{% endblock %}
+
+{% block content %}
     <div id="mapContainer"></div>
-    <div id="tip">    
-        <input type="button" value="自定义样式点聚合" onClick="javascript:addCluster(1)"/>
-        <input type="button" value="默认样式点聚合" onClick="javascript:addCluster(0)"/>
-    </div>
     
-    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=您申请的key值"></script>
     <script type="text/javascript">
         var cluster;
         var markers= [];
@@ -75,9 +27,9 @@
         map.plugin(["AMap.ToolBar"],function(){
           //加载工具条
           tool = new AMap.ToolBar({
-            direction:true,//隐藏方向导航
-            ruler:true,//隐藏视野级别控制尺
-            autoPosition:true//禁止自动定位
+            direction:true,//方向导航
+            ruler:true,//视野级别控制尺
+            autoPosition:false//禁止自动定位
           });
           map.addControl(tool);
         });
@@ -138,5 +90,4 @@
             }
         }
     </script>
-</body>
-</html>                     
+{% endblock %}
