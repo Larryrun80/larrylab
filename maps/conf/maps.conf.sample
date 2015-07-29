@@ -1,0 +1,6 @@
+[DB_INFO]
+Host = SOME_HOST
+User = USER_NAME
+Password = PASSWORD
+Database = DATABASE
+Port = 3306
