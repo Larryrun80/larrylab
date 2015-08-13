@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %} {{data["title"]}} {% endblock %}
+{% block content %} 
+    {% for section in data["sections"] %}
+    <hr>
+    <h3> {{ section["section"] }} </h3>
+        {% for figure in section["figures"] %}
+            <img src={{ figure["figure_url"] }} alt={{ figure["alt_text"] }}>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

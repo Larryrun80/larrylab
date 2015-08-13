@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+  <head>
+    {% block head %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>{% block title %}{% endblock %} - By Larry</title>
+    {% endblock %}
+  </head>
+  <body>
+    <div id="content">{% block content %}hi{% endblock %}</div>
+    <div id="footer">
+      {% block footer %}
+      &copy; Copyright 2015 by  <a href="http://www.iqianggou.com/">larry.iqianggou</a>.
+      {% endblock %}
+    </div>
+  </body>
+</html>
