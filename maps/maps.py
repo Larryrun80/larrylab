@@ -2,7 +2,7 @@ from flask import Flask, render_template, request
 import maplogic
 
 # configuration
-DEBUG = True
+DEBUG = False
 SECRET_KEY = 'larry de key'
 
 app = Flask(__name__)
