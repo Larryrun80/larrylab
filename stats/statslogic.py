@@ -24,6 +24,8 @@ class Stats:
     IMG_PATH = 'static/stats_images/'
     IMG_PATH_REAL = os.path.abspath(os.path.dirname(__file__))
     IMG_PATH_REAL += '/' + IMG_PATH
+    if not os.path.exists(IMG_PATH_REAL):
+        os.makedirs(IMG_PATH_REAL)
 
     # Here we define the standard return value
     # if success is False， you should flash the err_message
@@ -49,7 +51,7 @@ class Stats:
 
     def __init__(self):
         config_file = os.path.abspath(os.path.dirname(__file__)) \
-                  + '/conf/maps.conf'
+                  + '/conf/stats.conf'
         # generate general stat dates
         self.line_color = ('orange', 'blue', 'red', 'green',
                            'purple', 'yellow', 'grey', 'black')
