@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect,\
-                  url_for, make_response, jsonify
+                  url_for
 import statslogic
 
 # configuration
@@ -20,6 +20,18 @@ def index():
 def show_user_stats():
     stats = statslogic.Stats()
     data = stats.analyze('user')
+    if 'success' in data.keys() and data['success']:
+        return render_template('stats.html', data=data)
+    else:
+        flash(data['err_message'])
+        return redirect(url_for('helloworld'))
+
+
+# 订单统计
+@app.route('/order')
+def show_order_stats():
+    stats = statslogic.Stats()
+    data = stats.analyze('order')
     if 'success' in data.keys() and data['success']:
         return render_template('stats.html', data=data)
     else:

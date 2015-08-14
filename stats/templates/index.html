@@ -3,8 +3,7 @@
 {% block content %} 
     <h2>Here is the index page of stats project</h2>
     <ul>
-        <li>
-            <a href={{ url_for('show_user_stats') }}>用户统计图</a>
-        </li>
+        <li><a href={{ url_for('show_user_stats') }}>用户统计图</a></li>
+        <li><a href={{ url_for('show_order_stats') }}>订单统计图</a></li>
     </ul>
 {% endblock %}

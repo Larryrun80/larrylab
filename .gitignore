@@ -2,3 +2,5 @@
 *.conf
 *.yaml
 uwsgi_params
+static/stats_images/
+.DS_Store
