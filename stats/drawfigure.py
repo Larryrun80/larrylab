@@ -6,20 +6,21 @@ import os
 
 from matplotlib.font_manager import FontProperties
 import matplotlib.pyplot as plt
-import pylab
+# import pylab
 import numpy as np
+
+FONT = FontProperties(fname=r"static/fonts/msyahei.ttf")
 
 
 def init_figure():
-    pylab.mpl.rcParams['font.sans-serif'] = ['Adobe Heiti Std']
+    # pylab.mpl.rcParams['font.sans-serif'] = ['Adobe Heiti Std']
     figure = plt.figure(figsize=(12, 5))
-    font = FontProperties()
 
-    font_title = font.copy()
-    font_title.set_size('x-large')
+    font_title = FONT.copy()
+    font_title.set_size('large')
     font_title.set_weight('bold')
 
-    font_axis = font.copy()
+    font_axis = FONT.copy()
     font_axis.set_size('medium')
     font_axis.set_weight('normal')
     font_axis.set_style('italic')
@@ -109,8 +110,12 @@ def draw_line_chart_lines(ax, x_data, y_data, **kwargs):
                         color=color,
                         horizontalalignment='center')
     if 'show_legend' in kwargs.keys() and kwargs['show_legend']:
+        font_legend = FONT.copy()
+        font_legend.set_size('x-small')
+        font_legend.set_style('italic')
+
         ncols = kwargs.get('legend_cols', 1)
-        ax.legend(loc='upper center', framealpha=0.5, fontsize='small',
+        ax.legend(loc='upper center', framealpha=0.5, prop=font_legend,
                   ncol=ncols)
     return line, ax
 

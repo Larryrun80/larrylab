@@ -49,7 +49,7 @@ class Stats:
 
     def __init__(self):
         config_file = os.path.abspath(os.path.dirname(__file__)) \
-                  + '/conf/maps.conf'
+                  + '/conf/stats.conf'
         # generate general stat dates
         self.line_color = ('orange', 'blue', 'red', 'green',
                            'purple', 'yellow', 'grey', 'black')
@@ -63,21 +63,17 @@ class Stats:
         self.x_data_month = np.arange(0, len(self.stats_dates_month))
 
         # get connect db info
-        try:
-            config = ConfigParser()
-            config.read(config_file)
+        config = ConfigParser()
+        config.read(config_file)
 
-            # get db params
-            self.db_config = {
-                               'host': config.get('DB_INFO', 'Host'),
-                               'user': config.get('DB_INFO', 'User'),
-                               'password': config.get('DB_INFO', 'Password'),
-                               'database': config.get('DB_INFO', 'Database'),
-                               'port': config.get('DB_INFO', 'Port'),
-                             }
-        except Exception as e:
-            self.result['err_message'] = str(e)
-            return self.result
+        # get db params
+        self.db_config = {
+                           'host': config.get('DB_INFO', 'Host'),
+                           'user': config.get('DB_INFO', 'User'),
+                           'password': config.get('DB_INFO', 'Password'),
+                           'database': config.get('DB_INFO', 'Database'),
+                           'port': config.get('DB_INFO', 'Port'),
+                         }
 
     def analyze(self, stats_type):
         # checking if the stats_type is legal
@@ -129,9 +125,6 @@ class Stats:
         y_data = []
         y_data.append({'data': np.array(stats_data),
                        'label': u'注册数'})
-        y_data.append({'data': np.random.randint(1000, 2000,
-                                                 size=len(self.x_data_month)),
-                       'label': u'随机对比'})
 
         show_legend = True
         show_annotate = True
