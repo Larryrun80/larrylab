@@ -44,14 +44,6 @@ class Stats:
         # generate general stat dates
         self.line_color = ('orange', 'blue', 'red', 'green',
                            'purple', 'yellow', 'grey', 'black')
-        self.today = arrow.now('Asia/Shanghai')
-        self.end_date = arrow.now('Asia/Shanghai').replace(days=-1)
-        self.start_date_month = self.end_date.replace(days=-30)
-        self.stats_dates_month = []
-        for dt in arrow.Arrow.range('day', self.start_date_month,
-                                    self.end_date):
-            self.stats_dates_month.append(dt.format('YY-MM-DD'))
-        self.x_data_month = np.arange(0, len(self.stats_dates_month))
 
     def analyze(self, stats_type):
         # checking if the stats_type is legal
@@ -101,6 +93,16 @@ class Stats:
                                          ''.format(stats_type)
             return self.result
 
+        today = arrow.now('Asia/Shanghai')
+        stats_end_date = arrow.now('Asia/Shanghai').replace(days=-1)
+        stats_start_date_month = stats_end_date.replace(days=-30)
+        stats_dates_month = []
+        for dt in arrow.Arrow.range('day',
+                                    stats_start_date_month,
+                                    stats_end_date):
+            stats_dates_month.append(dt.format('YY-MM-DD'))
+        x_val_month = np.arange(0, len(stats_dates_month))
+
         # get connect db info
         if not os.path.exists(self.CONFIG_PATH):
             self.result['err_message'] = '未找到config配置文件'
@@ -137,8 +139,8 @@ class Stats:
                 for line in figure['lines']:
                     # get data
                     stats_data = []
-                    start_date = self.start_date_month.format('YYYY-MM-DD')
-                    end_date = self.today.format('YYYY-MM-DD')
+                    start_date = stats_start_date_month.format('YYYY-MM-DD')
+                    end_date = today.format('YYYY-MM-DD')
                     sql_str = line['mysql'].replace('{start_date}',
                                                     start_date)
                     sql_str = sql_str.replace('{end_date}',
@@ -155,9 +157,9 @@ class Stats:
                 if y_data:
                     drawfigure.draw_line_chart('month',
                                                figure['url'],
-                                               self.x_data_month,
+                                               x_val_month,
                                                y_data,
-                                               self.stats_dates_month,
+                                               stats_dates_month,
                                                title=figure['name'],
                                                ylabel=figure['ylabel'],
                                                show_annotate=show_annotate,
