@@ -8,7 +8,16 @@
     {% endblock %}
   </head>
   <body>
-    <div id="content">{% block content %}hi{% endblock %}</div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes>
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">
       {% block footer %}
       &copy; Copyright 2015 by  <a href="http://www.iqianggou.com/">larry.iqianggou</a>.

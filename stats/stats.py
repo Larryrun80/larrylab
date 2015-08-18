@@ -24,7 +24,7 @@ def show_user_stats():
         return render_template('stats.html', data=data)
     else:
         flash(data['err_message'])
-        return data['err_message']
+        return redirect(url_for('index'))
 
 
 # 订单统计
