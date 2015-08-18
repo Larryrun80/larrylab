@@ -24,7 +24,7 @@ def show_user_stats():
         return render_template('stats.html', data=data)
     else:
         flash(data['err_message'])
-        return redirect(url_for('helloworld'))
+        return data['err_message']
 
 
 # 订单统计
@@ -36,7 +36,7 @@ def show_order_stats():
         return render_template('stats.html', data=data)
     else:
         flash(data['err_message'])
-        return redirect(url_for('helloworld'))
+        return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

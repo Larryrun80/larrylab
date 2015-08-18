@@ -5,7 +5,7 @@
     <hr>
     <h3> {{ section["section"] }} </h3>
         {% for figure in section["figures"] %}
-            <img src={{ figure["figure_url"] }} alt={{ figure["alt_text"] }}>
+            <img src={{ figure["url"] }} alt={{ figure["name"] }}>
         {% endfor %}
     {% endfor %}
 {% endblock %}
