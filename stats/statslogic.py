@@ -112,7 +112,7 @@ class Stats:
         # the node info to be dealed
         sections = None
         title = None
-        with open(self.CONFIG_YAML_PATH) as f:
+        with open(self.CONFIG_YAML_PATH, encoding='utf-8') as f:
             yaml_data = yaml.load(f)
 
             # getting correspoding yaml node
@@ -149,7 +149,6 @@ class Stats:
                     stats_data = []
                     start_date = self.start_date_month.format('YYYY-MM-DD')
                     end_date = self.today.format('YYYY-MM-DD')
-                    print(start_date)
                     sql_str = line['mysql'].replace('{start_date}',
                                                     start_date)
                     sql_str = sql_str.replace('{end_date}',
