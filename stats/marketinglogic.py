@@ -39,6 +39,8 @@ class MarketingTracker():
         if data_type == 'count':
             return len(data)
         else:
+            if len(data) == 0:
+                return 0
             return data[0][0]
 
     def get_mobiles(self, str_mobiles):
@@ -143,9 +145,9 @@ class MarketingTracker():
                             self.result['sections'].append(stats_info)
 
             self.result['success'] = True
-            self.err_message = ''
+            self.result['err_message'] = ''
             return self.result
-        except:
+        except ImportError:
             err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
                                             str(sys.exc_info()[1]))
             self.result['err_message'] = err_message
