@@ -1,6 +1,7 @@
 from flask import Flask, render_template, flash, redirect,\
-                  url_for
+                  url_for, request
 import statslogic
+import marketinglogic
 
 # configuration
 DEBUG = True
@@ -37,6 +38,23 @@ def show_order_stats():
     else:
         flash(data['err_message'])
         return redirect(url_for('index'))
+
+
+# 市场数据追踪
+@app.route('/tm', methods=['GET', 'POST'])
+def track_marketing_via_mobile():
+    data = {'title': '查看市场数据'}
+    if request.method == 'POST':
+        str_mobiles = request.form['promotedmobiles']
+        tracker = marketinglogic.MarketingTracker()
+        dealed_mobiles = tracker.get_mobiles(str_mobiles)
+        data = tracker.get_marketing_info(dealed_mobiles)
+        if 'success' in data.keys() and data['success']:
+            data['mobiles'] = str_mobiles
+        else:
+            flash(data['err_message'])
+
+    return render_template('trackmarketing.html', data=data)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

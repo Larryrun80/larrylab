@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Filename: maplogic.py
+# Filename: statslogic.py
 
-from configparser import ConfigParser
 import os
 import sys
 
@@ -11,6 +10,8 @@ import mysql.connector
 import numpy as np
 import yaml
 import drawfigure
+
+import kits
 
 
 class Stats:
@@ -30,20 +31,20 @@ class Stats:
     if not os.path.exists(IMG_PATH):
         os.makedirs(IMG_PATH)
 
-    # Here we define the standard return value
-    # if success is False， you should flash the err_message
-    # data will include what should be showed in a table on page
-    result = {
-                'success':          False,
-                'err_message':      '暂不支持此统计',
-                'title':            '',
-                'sections':         [],
-             }
-
     def __init__(self):
         # generate general stat dates
         self.line_color = ('orange', 'blue', 'red', 'green',
                            'purple', 'yellow', 'grey', 'black')
+
+        # Here we define the standard return value
+        # if success is False， you should flash the err_message
+        # data will include what should be showed in a table on page
+        self.result = {
+                        'success':          False,
+                        'err_message':      '暂不支持此统计',
+                        'title':            '',
+                        'sections':         [],
+                      }
 
     def analyze(self, stats_type):
         # checking if the stats_type is legal
@@ -103,24 +104,11 @@ class Stats:
             stats_dates_month.append(dt.format('YY-MM-DD'))
         x_val_month = np.arange(0, len(stats_dates_month))
 
-        # get connect db info
-        if not os.path.exists(self.CONFIG_PATH):
-            self.result['err_message'] = '未找到config配置文件'
+        db_config = kits.get_mysql_config(self.CONFIG_PATH, config_section)
+        if db_config is None:
+            self.result['err_message'] = '读取数据库配置失败'
             return self.result
-        config = ConfigParser()
-        config.read(self.CONFIG_PATH)
 
-        # get db params
-        try:
-            db_config = {
-                          'host': config.get(config_section, 'Host'),
-                          'user': config.get(config_section, 'User'),
-                          'password': config.get(config_section, 'Password'),
-                          'database': config.get(config_section, 'Database'),
-                          'port': config.get(config_section, 'Port'),
-                        }
-        except:
-            db_config = None
         # getting data
         cnx = mysql.connector.connect(**db_config)
         cursor = cnx.cursor()

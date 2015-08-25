@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %} {{data["title"]}} {% endblock %}
+{% block content %} 
+    <form action="{{ url_for('track_marketing_via_mobile') }}" method=post>
+        <dl>
+            <dd>在下面的文本框中输入手机号，用逗号/空格/回车分割</dd>
+            <dd><textarea name=promotedmobiles rows=10 cols=30>{% if data and data['mobiles'] %}{{ data['mobiles'] }}{% endif %}</textarea></dd>
+            <dd><input type=submit value="查询"></dd>
+        </dl>
+    </form>
+    {% if data and data['success'] and data['sections'] %}
+    <ul>
+        {% for section in data['sections'] %}
+            <li>{{ section["name"] }}:  {{ section["value"] }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endblock %}
