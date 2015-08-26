@@ -2,18 +2,33 @@
 {% block title %} {{data["title"]}} {% endblock %}
 {% block content %} 
 
+    <script type="text/javascript">
+    $('#myTabs a').click(function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+    })
+
+    $(document).ready(function(){
+        var tabhref = "#byMobiles"
+        {% if data and data['tab'] %}
+            tabhref = "{{ data['tab'] }}"
+        {% endif %}
+        $('#myTabs a[href=' + tabhref + ']').tab('show')
+    });
+    </script>
+
     <div class="col-md-8">
-      <ul class="nav nav-tabs nav-justified" role="tablist">
-        <li role="presentation" class="active"><a href="#home" aria-controls="byMobiles" role="tab" data-toggle="tab">用手机号查询</a></li>
-        <li role="presentation"><a href="#profile" aria-controls="byCards" role="tab" data-toggle="tab">用微信号查询</a></li>
-        <li role="presentation"><a href="#messages" aria-controls="byWechat" role="tab" data-toggle="tab">用兑换码查询</a></li>
+      <ul class="nav nav-tabs nav-justified" role="tablist" id="myTabs">
+        <li role="presentation"><a href="#byMobiles" aria-controls="byMobiles" role="tab" data-toggle="tab">用手机号查询</a></li>
+        <li role="presentation"><a href="#byCards" aria-controls="byCards" role="tab" data-toggle="tab">用微信号查询</a></li>
+        <li role="presentation"><a href="#byWechat" aria-controls="byWechat" role="tab" data-toggle="tab">用兑换码查询</a></li>
       </ul>
 
       <div class="clearfix" style="margin-bottom: 30px;"></div>
 
      <!-- Tab panes -->
       <div class="tab-content">
-        <div role="tabpanel" class="tab-pane active" id="home">
+        <div role="tabpanel" class="tab-pane" id="byMobiles">
             <form action="{{ url_for('track_marketing_via_mobile') }}" method=post>
                 <div class="form-group">
                     <textarea id="inputMobiles" name="inputMobiles" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['mobiles'] %}{{ data['mobiles'] }}{% endif %}</textarea>
@@ -23,10 +38,10 @@
                 </dl>
             </form>
         </div>
-        <div role="tabpanel" class="tab-pane" id="profile">
-            本功能暂未开通
+        <div role="tabpanel" class="tab-pane" id="byCards">
+            本功能暂未开通1
         </div>
-        <div role="tabpanel" class="tab-pane" id="messages">
+        <div role="tabpanel" class="tab-pane" id="byWechat">
             本功能暂未开通
         </div>
       </div>

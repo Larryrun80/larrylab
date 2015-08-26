@@ -43,7 +43,7 @@ def show_order_stats():
 # 市场数据追踪
 @app.route('/tm', methods=['GET', 'POST'])
 def track_marketing_via_mobile():
-    data = {'title': '查看市场数据'}
+    data = {'title': '查看市场数据', 'tab': '#byCards'}
     if request.method == 'POST':
         str_mobiles = request.form['inputMobiles']
         tracker = marketinglogic.MarketingTracker()
