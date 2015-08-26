@@ -45,7 +45,7 @@ def show_order_stats():
 def track_marketing_via_mobile():
     data = {'title': '查看市场数据'}
     if request.method == 'POST':
-        str_mobiles = request.form['promotedmobiles']
+        str_mobiles = request.form['inputMobiles']
         tracker = marketinglogic.MarketingTracker()
         dealed_mobiles = tracker.get_mobiles(str_mobiles)
         data = tracker.get_marketing_info(dealed_mobiles)
