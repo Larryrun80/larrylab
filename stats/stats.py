@@ -64,7 +64,7 @@ def track_marketing_via_mobile():
                 data['source'] = str_source
             else:
                 flash(data['err_message'])
-
+    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 if __name__ == '__main__':
