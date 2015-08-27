@@ -98,6 +98,8 @@ class MarketingTracker():
                             if len(users) > 10000:
                                 raise RuntimeError('处理数据过多，请分批处理，'
                                                    '单次处理数据应小于10000条')
+                            if len(users) == 0:
+                                raise RuntimeError('未找到任何注册用户')
                             for (user_id,) in users:
                                 ids.append(str(user_id))
 
