@@ -64,9 +64,11 @@ class MarketingTracker():
             res = ', '.join(checked)
         return res
 
-    def get_user_ids(self, str_mobiles):
-        ids = []
+    def get_user_ids(self, str_source, data_type):
+        if data_type is None:
+            raise RuntimeError('未定义的数据源类型')
 
+        ids = []
         with open(self.CONFIG_YAML_PATH, encoding='utf-8') as f:
             yaml_data = yaml.load(f)
 
@@ -74,7 +76,8 @@ class MarketingTracker():
             for job in yaml_data:
                 if 'get register info' in job.keys():
                     for sub_job in job['get register info']:
-                        if sub_job["id"] == 'mobile_to_id':
+                        sub_job_key = 'from_' + data_type
+                        if sub_job["id"] == sub_job_key:
                             section_name = sub_job['db_info']
                             sql_str = sub_job['mysql']
                             display_name = sub_job['name']
@@ -85,9 +88,9 @@ class MarketingTracker():
 
                             cnx = mysql.connector.connect(**db_config)
                             cursor = cnx.cursor()
-                            sql_str = sql_str.replace('{mobiles}',
+                            sql_str = sql_str.replace('{source_data}',
                                                       '({0})'
-                                                      ''.format(str_mobiles))
+                                                      ''.format(str_source))
                             cursor.execute(sql_str)
                             users = cursor.fetchall()
                             cnx.close()
@@ -108,9 +111,9 @@ class MarketingTracker():
 
         return ids
 
-    def get_marketing_info(self, str_mobiles):
+    def get_marketing_info(self, str_mobiles, data_type):
         try:
-            ids = self.get_user_ids(str_mobiles)
+            ids = self.get_user_ids(str_mobiles, data_type)
 
             with open(self.CONFIG_YAML_PATH, encoding='utf-8') as f:
                 yaml_data = yaml.load(f)
