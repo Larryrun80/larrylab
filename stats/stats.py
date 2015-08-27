@@ -43,17 +43,24 @@ def show_order_stats():
 # 市场数据追踪
 @app.route('/tm', methods=['GET', 'POST'])
 def track_marketing_via_mobile():
-    data = {'title': '查看市场数据', 'tab': '#byCards'}
+    data = {'title': '查看市场数据'}
+    data['tab'] = 'wechat'
     if request.method == 'POST':
+        req_type = request.args.get('type')
+        data['tab'] = req_type
         str_mobiles = request.form['inputMobiles']
         tracker = marketinglogic.MarketingTracker()
         dealed_mobiles = tracker.get_mobiles(str_mobiles)
-        data = tracker.get_marketing_info(dealed_mobiles)
-        if 'success' in data.keys() and data['success']:
-            data['mobiles'] = str_mobiles
+        if len(dealed_mobiles) == 0:
+            flash('未找到任何注册用户')
         else:
-            flash(data['err_message'])
+            data = tracker.get_marketing_info(dealed_mobiles)
+            if 'success' in data.keys() and data['success']:
+                data['mobiles'] = str_mobiles
+            else:
+                flash(data['err_message'])
 
+    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 if __name__ == '__main__':

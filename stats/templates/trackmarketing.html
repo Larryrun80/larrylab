@@ -1,35 +1,49 @@
 {% extends "layout.html" %}
 {% block title %} {{data["title"]}} {% endblock %}
 {% block content %} 
-
-    <script type="text/javascript">
-    $('#myTabs a').click(function (e) {
-      e.preventDefault()
-      $(this).tab('show')
-    })
-
-    $(document).ready(function(){
-        var tabhref = "#byMobiles"
-        {% if data and data['tab'] %}
-            tabhref = "{{ data['tab'] }}"
-        {% endif %}
-        $('#myTabs a[href=' + tabhref + ']').tab('show')
-    });
-    </script>
-
     <div class="col-md-8">
       <ul class="nav nav-tabs nav-justified" role="tablist" id="myTabs">
-        <li role="presentation"><a href="#byMobiles" aria-controls="byMobiles" role="tab" data-toggle="tab">用手机号查询</a></li>
-        <li role="presentation"><a href="#byCards" aria-controls="byCards" role="tab" data-toggle="tab">用微信号查询</a></li>
-        <li role="presentation"><a href="#byWechat" aria-controls="byWechat" role="tab" data-toggle="tab">用兑换码查询</a></li>
+        <li role="presentation"><a href="#mobiles" aria-controls="mobiles" role="tab" data-toggle="tab">用手机号查询</a></li>
+        <li role="presentation"><a href="#cards" aria-controls="cards" role="tab" data-toggle="tab">用兑换码查询</a></li>
+        <li role="presentation"><a href="#wechat" aria-controls="wechat" role="tab" data-toggle="tab">用微信号查询</a></li>
       </ul>
 
       <div class="clearfix" style="margin-bottom: 30px;"></div>
 
      <!-- Tab panes -->
       <div class="tab-content">
-        <div role="tabpanel" class="tab-pane" id="byMobiles">
-            <form action="{{ url_for('track_marketing_via_mobile') }}" method=post>
+        <div role="tabpanel" class="tab-pane" id="mobiles">
+            <form action="{{ url_for('track_marketing_via_mobile') }}?type=mobiles" method=post>
+                <div class="form-group">
+                    <textarea id="inputMobiles" name="inputMobiles" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['mobiles'] %}{{ data['mobiles'] }}{% endif %}</textarea>
+                    <span id="helpBlock" class="help-block">在上面的文本框中输入需要查询的手机号，手机号之间可以用空格，逗号，或回车分格，请留意一次不要输入过多的（小于10000个）手机号</span>
+                  </div>
+                  <button type="submit" class="btn btn-success btn-block">查询</button>
+                </dl>
+            </form>
+
+        <div class="clearfix" style="margin-bottom: 10px;"></div>
+
+        {% if data and data['success'] and data['sections'] and data['tab'] and data['tab'] == 'mobiles' %}
+        {{ data['type'] }}
+        <div class="col-md-8">
+            <table  class="table table-hover">
+                <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
+                {% for section in data['sections'] %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ section["name"] }}</td>
+                    <td>{{ section["value"] }}</td>
+                    <td><a href=#>下载明细</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+        </div>
+
+        <div role="tabpanel" class="tab-pane" id="cards">
+             <form action="{{ url_for('track_marketing_via_mobile') }}?type=cards" method=post>
                 <div class="form-group">
                     <textarea id="inputMobiles" name="inputMobiles" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['mobiles'] %}{{ data['mobiles'] }}{% endif %}</textarea>
                     <span id="helpBlock" class="help-block">在上面的文本框中输入需要查询的手机号，手机号之间可以用空格，逗号，或回车分格，请留意一次不要输入过多的（小于10000个）手机号</span>
@@ -38,30 +52,23 @@
                 </dl>
             </form>
         </div>
-        <div role="tabpanel" class="tab-pane" id="byCards">
-            本功能暂未开通1
-        </div>
-        <div role="tabpanel" class="tab-pane" id="byWechat">
+        <div role="tabpanel" class="tab-pane" id="wechat">
             本功能暂未开通
         </div>
       </div>
     </div>
 
-    <div class="clearfix" style="margin-bottom: 10px;"></div>
+    <script type="text/javascript">
+    $('#myTabs a').click(function (e) {
+      e.preventDefault()
+      $(this).tab('show')
+    })
 
-    {% if data and data['success'] and data['sections'] %}
-    <div class="col-md-8">
-        <table  class="table table-hover">
-            <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
-            {% for section in data['sections'] %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>{{ section["name"] }}</td>
-                <td>{{ section["value"] }}</td>
-                <td><a href=#>下载明细</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-    </div>
+    var tabhref = "#mobiles"
+    {% if data and data['tab'] %}
+        tabhref = "#{{ data['tab'] }}"
     {% endif %}
+    $('#myTabs a[href=' + tabhref + ']').tab('show')
+
+    </script>
 {% endblock %}
