@@ -49,6 +49,8 @@ def track_marketing_via_mobile():
         req_type = request.args.get('type')
         form_name = 'input_' + req_type
         str_source = request.form[form_name]
+        data['tab'] = req_type
+        data['source'] = str_source
 
         tracker = marketinglogic.MarketingTracker()
         if req_type == 'mobiles':
@@ -57,12 +59,9 @@ def track_marketing_via_mobile():
         if len(str_source) == 0:
             flash('未找到任何注册用户')
         else:
-            data = tracker.get_marketing_info(str_source, req_type)
-            data['tab'] = req_type
-            data['title'] = ''
-            if 'success' in data.keys() and data['success']:
-                data['source'] = str_source
-            else:
+            m_data = tracker.get_marketing_info(str_source, req_type)
+            data.update(m_data)
+            if not ('success' in data.keys() and data['success']):
                 flash(data['err_message'])
 
     return render_template('trackmarketing.html', data=data)

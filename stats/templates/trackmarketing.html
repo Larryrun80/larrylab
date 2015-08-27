@@ -15,7 +15,7 @@
         <div role="tabpanel" class="tab-pane" id="mobiles">
             <form action="{{ url_for('track_marketing_via_mobile') }}?type=mobiles" method=post>
                 <div class="form-group">
-                    <textarea id="input_mobiles" name="input_mobiles" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['source'] %}{{ data['source'] }}{% endif %}</textarea>
+                    <textarea id="input_mobiles" name="input_mobiles" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['source'] and data['tab'] and data['tab'] == 'mobiles' %}{{ data['source'] }}{% endif %}</textarea>
                     <span id="helpBlock" class="help-block">在上面的文本框中输入需要查询的手机号，手机号之间可以用空格，逗号，或回车分格，请留意一次不要输入过多的（小于10000个）手机号</span>
                   </div>
                   <button type="submit" class="btn btn-success btn-block">查询</button>
@@ -44,7 +44,7 @@
         <div role="tabpanel" class="tab-pane" id="cards">
              <form action="{{ url_for('track_marketing_via_mobile') }}?type=cards" method=post>
                 <div class="form-group">
-                    <input id="input_cards" name="input_cards" type="text" class="form-control" placeholder="batch id" value="{% if data and data['source'] %}{{ data['source'] }}{% endif %}">
+                    <input id="input_cards" name="input_cards" type="text" class="form-control" placeholder="batch id" value="{% if data and data['source'] and data['tab'] and data['tab'] == 'cards' %}{{ data['source'] }}{% endif %}">
                     <span class="help-block">在上面的文本框中输入充值卡的批次号（batch id）</span>
                   </div>
                   <button type="submit" class="btn btn-success btn-block">查询</button>
