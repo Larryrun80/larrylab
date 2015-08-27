@@ -62,7 +62,7 @@ class Stats:
             # method = getattr(self, method_name, lambda: self.result)
             # return method()
             return self.get_data(stats_type)
-        except:
+        except TypeError:
             err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
                                             str(sys.exc_info()[1]))
             self.result['err_message'] = err_message
@@ -127,17 +127,23 @@ class Stats:
                 for line in figure['lines']:
                     # get data
                     stats_data = []
-                    start_date = stats_start_date_month.format('YYYY-MM-DD')
-                    end_date = today.format('YYYY-MM-DD')
-                    sql_str = line['mysql'].replace('{start_date}',
-                                                    start_date)
-                    sql_str = sql_str.replace('{end_date}',
-                                              end_date)
 
-                    cursor.execute(sql_str)
-                    raw_data = cursor.fetchall()
-                    for (order_date, order_count) in raw_data:
-                        stats_data.append(order_count)
+                    day = stats_start_date_month
+                    while (day <= stats_end_date):
+                        start_date_str = day.format('YYYY-MM-DD')
+                        day = day.replace(days=1)
+                        end_date_str = day.format('YYYY-MM-DD')
+
+                        sql_str = line['mysql'].replace('{start_date}',
+                                                        start_date_str)
+                        sql_str = sql_str.replace('{end_date}',
+                                                  end_date_str)
+                        cursor.execute(sql_str)
+                        raw_data = cursor.fetchall()
+                        if len(raw_data) == 0:
+                            stats_data.append(0)
+                        else:
+                            stats_data.append(raw_data[0][1])
 
                     y_data.append({'data': np.array(stats_data),
                                    'label': line['label']})
