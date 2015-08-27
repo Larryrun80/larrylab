@@ -25,13 +25,13 @@
         <div class="clearfix" style="margin-bottom: 10px;"></div>
 
         {% if data and data['success'] and data['sections'] and data['tab'] and data['tab'] == 'mobiles' %}
-        <div class="col-md-8">
+        <div>
             <table  class="table table-hover">
                 <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
                 {% for section in data['sections'] %}
                 <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ section["name"] }}</td>
+                    <td>{{ loop.index0 }}</td>
+                    <td>{{ section["name"]|safe }}</td>
                     <td>{{ section["value"] }}</td>
                     <td><a href=#>下载明细</a></td>
                 </tr>
@@ -54,13 +54,13 @@
         <div class="clearfix" style="margin-bottom: 10px;"></div>
 
         {% if data and data['success'] and data['sections'] and data['tab'] and data['tab'] == 'cards' %}
-        <div class="col-md-8">
+        <div>
             <table  class="table table-hover">
                 <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
                 {% for section in data['sections'] %}
                 <tr>
                     <td>{{ loop.index }}</td>
-                    <td>{{ section["name"] }}</td>
+                    <td>{{ section["name"]|safe }}</td>
                     <td>{{ section["value"] }}</td>
                     <td><a href=#>下载明细</a></td>
                 </tr>

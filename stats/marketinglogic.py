@@ -6,6 +6,7 @@ import os
 import re
 import sys
 
+import arrow
 import mysql.connector
 import yaml
 
@@ -69,6 +70,8 @@ class MarketingTracker():
             raise RuntimeError('未定义的数据源类型')
 
         ids = []
+        general_name = ''
+        r_dates = []
         with open(self.CONFIG_YAML_PATH, encoding='utf-8') as f:
             yaml_data = yaml.load(f)
 
@@ -78,6 +81,7 @@ class MarketingTracker():
                     for sub_job in job['get register info']:
                         sub_job_key = 'from_' + data_type
                         if sub_job["id"] == sub_job_key:
+                            total_user = 0
                             section_name = sub_job['db_info']
                             sql_str = sub_job['mysql']
                             display_name = sub_job['name']
@@ -93,22 +97,59 @@ class MarketingTracker():
                                                       ''.format(str_source))
                             cursor.execute(sql_str)
                             users = cursor.fetchall()
-                            cnx.close()
 
                             if len(users) > 10000:
+                                cnx.close()
                                 raise RuntimeError('处理数据过多，请分批处理，'
                                                    '单次处理数据应小于10000条')
                             if len(users) == 0:
-                                raise RuntimeError('未找到任何注册用户')
-                            for (user_id,) in users:
-                                ids.append(str(user_id))
+                                cnx.close()
+                                raise RuntimeError('未找到注册用户')
 
+                            # dealing general info
+                            for (user_id, r_date) in users:
+                                ids.append(str(user_id))
+                                r_dates.append(arrow.get(r_date, 'YYYY-MM-DD'))
+
+                            if data_type == 'cards':
+                                sql_str_total = 'select name, quantity '\
+                                                'from prepaid_card_batch '\
+                                                'where id='\
+                                                '{0};'.format(str_source)
+                                cursor.execute(sql_str_total)
+                                cards_info = cursor.fetchall()
+                                if len(cards_info) == 1:
+                                    general_name = cards_info[0][0]
+                                    total_user = cards_info[0][1]
+                                else:
+                                    cnx.close()
+                                    raise RuntimeError('获取卡信息失败')
+
+                            if data_type == 'mobiles':
+                                general_name = '用户手机信息'
+                                total_user = len(str_source.split(', '))
+
+                            min_r_date = min(r_dates).format('YYYY-MM-DD')
+                            max_r_date = max(r_dates).format('YYYY-MM-DD')
+                            general_info = {
+                                                'name': '{0} <br> [{1} ~ {2}]'
+                                                ''.format(general_name,
+                                                          min_r_date,
+                                                          max_r_date),
+                                                'value': total_user
+                            }
+                            cnx.close()
+
+                            # dealing register info
                             value = self.get_data_value(sub_job['type'],
                                                         users)
                             register_info = {
                                                 'name':     display_name,
                                                 'value':    value,
                                             }
+
+                            # add to list
+                            self.result['sections'].append(general_info)
                             self.result['sections'].append(register_info)
 
         return ids
@@ -152,6 +193,7 @@ class MarketingTracker():
             self.result['success'] = True
             self.result['err_message'] = ''
             return self.result
+
         except:
             err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
                                             str(sys.exc_info()[1]))
