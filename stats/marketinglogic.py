@@ -152,7 +152,7 @@ class MarketingTracker():
             self.result['success'] = True
             self.result['err_message'] = ''
             return self.result
-        except ImportError:
+        except:
             err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
                                             str(sys.exc_info()[1]))
             self.result['err_message'] = err_message

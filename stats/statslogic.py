@@ -62,7 +62,7 @@ class Stats:
             # method = getattr(self, method_name, lambda: self.result)
             # return method()
             return self.get_data(stats_type)
-        except TypeError:
+        except:
             err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
                                             str(sys.exc_info()[1]))
             self.result['err_message'] = err_message
