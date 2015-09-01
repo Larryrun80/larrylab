@@ -83,8 +83,6 @@ class MarketingTracker():
                             total_user = 0
                             section_name = sub_job['db_info']
                             sql_str = sub_job['mysql']
-                            display_name = sub_job['name']
-                            bind_id = sub_job['id']
                             db_config = kits.get_mysql_config(self.CONFIG_PATH,
                                                               section_name)
                             if db_config is None:
@@ -243,6 +241,8 @@ class MarketingTracker():
                     ws.write(row, col, data[row][col])
 
             save_file_path = tmp_file_dir + tmp_file_name
+            # if the file exists, try to generate another one
+            # this step is to avoid download a wrong file
             while os.path.isfile(save_file_path):
                 save_file_path += '-' + str(random.randint(0, 10000))
             save_file_path += '.' + file_type
