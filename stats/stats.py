@@ -1,5 +1,9 @@
+import os
+
+import xlwt
 from flask import Flask, render_template, flash, redirect,\
-                  url_for, request
+                  url_for, request, send_file, jsonify
+
 import statslogic
 import marketinglogic
 
@@ -64,7 +68,51 @@ def track_marketing_via_mobile():
             if not ('success' in data.keys() and data['success']):
                 flash(data['err_message'])
 
+    flash(data)
     return render_template('trackmarketing.html', data=data)
+
+
+# 下载文件
+@app.route('/getfile', methods=['GET', 'POST'])
+def get_file():
+    result = {
+                'success': False,
+                'message': "test",
+                'url':  ''
+             }
+    tmp_file_dir = 'static/tmp/'
+    tmp_file_name = 'tmp.xls'
+    if not os.path.exists(tmp_file_dir):
+        os.makedirs(tmp_file_dir)
+
+    quest_scope = request.form['scope']
+    quest_type = request.form['type']
+    quest_format = request.form['format']
+    quest_ids = request.form['ids']
+
+    if not quest_type or\
+       not quest_format or\
+       not quest_scope or\
+       not quest_ids:
+        result['message'] = '没有获取到正确的下载请求'
+        return jsonify(result)
+    else:
+        tracker = marketinglogic.MarketingTracker()
+        return_data = tracker.get_export_data(quest_scope,
+                                              quest_type,
+                                              quest_ids)
+
+        if quest_format == 'excel':
+            wb = xlwt.Workbook()
+            wb.encoding = 'gbk'
+            ws = wb.add_sheet('test')
+            ws.write(1, 2, 'yyyyy')
+
+            wb.save(tmp_file_dir + tmp_file_name)
+            result['success'] = True
+            result['url'] = tmp_file_dir + tmp_file_name
+
+        return jsonify(result)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')

@@ -55,10 +55,7 @@ class MarketingTracker():
         res = ''
         checked = []
         for mobile in mobiles:
-            if not re.match(regex, mobile):
-                res = 'wrong no: {0}'.format(mobile)
-                break
-            else:
+            if re.match(regex, mobile):
                 checked.append(mobile)
 
         if res == '':
@@ -85,6 +82,7 @@ class MarketingTracker():
                             section_name = sub_job['db_info']
                             sql_str = sub_job['mysql']
                             display_name = sub_job['name']
+                            bind_id = sub_job['id']
                             db_config = kits.get_mysql_config(self.CONFIG_PATH,
                                                               section_name)
                             if db_config is None:
@@ -97,7 +95,6 @@ class MarketingTracker():
                                                       ''.format(str_source))
                             cursor.execute(sql_str)
                             users = cursor.fetchall()
-
                             if len(users) > 10000:
                                 cnx.close()
                                 raise RuntimeError('处理数据过多，请分批处理，'
@@ -145,6 +142,7 @@ class MarketingTracker():
                                                         users)
                             register_info = {
                                                 'name':     display_name,
+                                                'id':       bind_id,
                                                 'value':    value,
                                             }
 
@@ -157,6 +155,8 @@ class MarketingTracker():
     def get_marketing_info(self, str_mobiles, data_type):
         try:
             ids = self.get_user_ids(str_mobiles, data_type)
+            str_ids = ', '.join(ids)
+            self.result['ids'] = str_ids
 
             with open(self.CONFIG_YAML_PATH, encoding='utf-8') as f:
                 yaml_data = yaml.load(f)
@@ -167,6 +167,7 @@ class MarketingTracker():
                         for sub_job in job['user track']:
                             section_name = sub_job['db_info']
                             sql_str = sub_job['mysql']
+                            bind_id = sub_job['id']
                             db_config = kits.get_mysql_config(self.CONFIG_PATH,
                                                               section_name)
                             if db_config is None:
@@ -174,7 +175,6 @@ class MarketingTracker():
 
                             cnx = mysql.connector.connect(**db_config)
                             cursor = cnx.cursor()
-                            str_ids = ', '.join(ids)
                             sql_str = sql_str.replace('{ids}',
                                                       '({0})'
                                                       ''.format(str_ids))
@@ -186,6 +186,7 @@ class MarketingTracker():
                                                         user_stats)
                             stats_info = {
                                              'name':     sub_job['name'],
+                                             'id':       bind_id,
                                              'value':    value,
                                          }
                             self.result['sections'].append(stats_info)

@@ -33,7 +33,17 @@
                     <td>{{ loop.index0 }}</td>
                     <td>{{ section["name"]|safe }}</td>
                     <td>{{ section["value"] }}</td>
-                    <td><a href=#>下载明细</a></td>
+                    <td>{% if section["id"] %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        导出明细数据 <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="#">csv格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="excel" href="#">excel格式</a></li>
+                      </ul>
+                    </div>
+                    {% endif %}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -55,14 +65,24 @@
 
         {% if data and data['success'] and data['sections'] and data['tab'] and data['tab'] == 'cards' %}
         <div>
-            <table  class="table table-hover">
+            <table class="table table-hover">
                 <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
                 {% for section in data['sections'] %}
                 <tr>
                     <td>{{ loop.index }}</td>
                     <td>{{ section["name"]|safe }}</td>
                     <td>{{ section["value"] }}</td>
-                    <td><a href=#>下载明细</a></td>
+                    <td>{% if section["id"] %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        导出明细数据 <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="#">csv格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="excel" href="#">excel格式</a></li>
+                      </ul>
+                    </div>
+                    {% endif %}</td>
                 </tr>
                 {% endfor %}
             </table>
@@ -80,13 +100,30 @@
     $('#myTabs a').click(function (e) {
       e.preventDefault()
       $(this).tab('show')
-    })
+    });
+
+    var url_get_file = "{{ url_for('get_file') }}"
+    $(".download").click(function(){
+      $.post( url_get_file,
+              {
+                'scope': 'marketing-tracker',
+                'type': $(this).data('type'),
+                'format': $(this).data('format'),
+                'ids': '{{ data["ids"] }}'
+              },
+              function(data) {
+                if (!data.success)
+                  alert(data.message)
+                else {
+                  window.location.href = data.url;
+                }
+              }, "json");
+      });
 
     var tabhref = "#mobiles"
     {% if data and data['tab'] %}
         tabhref = "#{{ data['tab'] }}"
     {% endif %}
     $('#myTabs a[href=' + tabhref + ']').tab('show')
-
     </script>
 {% endblock %}
