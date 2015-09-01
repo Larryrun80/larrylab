@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Filename: marketinglogic.py
 
+import csv
 import os
 import random
 import re
@@ -204,8 +205,9 @@ class MarketingTracker():
                             if r_type == sub_job['id']:
                                 section_name = sub_job['db_info']
                                 sql_str = sub_job['mysql']
-                                db_config = kits.get_mysql_config(self.CONFIG_PATH,
-                                                                  section_name)
+                                db_config = kits.get_mysql_config(
+                                                    self.CONFIG_PATH,
+                                                    section_name)
                                 if db_config is None:
                                         raise RuntimeError('读取数据库配置失败')
                                 cnx = mysql.connector.connect(**db_config)
@@ -223,7 +225,7 @@ class MarketingTracker():
             return {'message': err_message}
 
     def generate_file(self, file_type, data):
-        support_file_type = ('xls')
+        support_file_type = ('xls', 'csv')
         tmp_file_dir = 'static/tmp/'
         if not os.path.exists(tmp_file_dir):
             os.makedirs(tmp_file_dir)
@@ -231,6 +233,13 @@ class MarketingTracker():
 
         if file_type not in support_file_type:
             raise RuntimeError('目前不支持此格式文件')
+
+        save_file_path = tmp_file_dir + tmp_file_name
+        # if the file exists, try to generate another one
+        # this step is to avoid download a wrong file
+        while os.path.isfile(save_file_path):
+            save_file_path += '-' + str(random.randint(0, 10000))
+        save_file_path += '.' + file_type
 
         if file_type == 'xls':
             wb = xlwt.Workbook()
@@ -240,12 +249,14 @@ class MarketingTracker():
                 for col in range(len(data[0])):
                     ws.write(row, col, data[row][col])
 
-            save_file_path = tmp_file_dir + tmp_file_name
-            # if the file exists, try to generate another one
-            # this step is to avoid download a wrong file
-            while os.path.isfile(save_file_path):
-                save_file_path += '-' + str(random.randint(0, 10000))
-            save_file_path += '.' + file_type
-
             wb.save(save_file_path)
+            return save_file_path
+
+        if file_type == 'csv':
+            with open(save_file_path,
+                      mode='w',
+                      encoding='utf-8',
+                      errors='ignore') as target:
+                writer = csv.writer(target)
+                writer.writerows(data)
             return save_file_path
