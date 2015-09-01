@@ -229,7 +229,7 @@ class MarketingTracker():
         tmp_file_dir = 'static/tmp/'
         if not os.path.exists(tmp_file_dir):
             os.makedirs(tmp_file_dir)
-        tmp_file_name = arrow.now('Asia/Shanghai').format('YYYY-DDD')
+        tmp_file_name = arrow.now('Asia/Shanghai').format('YYYY-DDD-X')
 
         if file_type not in support_file_type:
             raise RuntimeError('目前不支持此格式文件')
