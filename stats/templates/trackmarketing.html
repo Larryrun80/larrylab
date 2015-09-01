@@ -33,14 +33,14 @@
                     <td>{{ loop.index0 }}</td>
                     <td>{{ section["name"]|safe }}</td>
                     <td>{{ section["value"] }}</td>
-                    <td>{% if section["id"] %}
+                    <td>{% if section["id"] and section["type"] and section["type"] == 'count' %}
                     <div class="btn-group">
                       <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         导出明细数据 <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="#">csv格式</a></li>
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="excel" href="#">excel格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="###">csv格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="xls" href="###">excel格式</a></li>
                       </ul>
                     </div>
                     {% endif %}</td>
@@ -78,8 +78,8 @@
                         导出明细数据 <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu">
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="#">csv格式</a></li>
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="excel" href="#">excel格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="###">csv格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="xls" href="###">excel格式</a></li>
                       </ul>
                     </div>
                     {% endif %}</td>

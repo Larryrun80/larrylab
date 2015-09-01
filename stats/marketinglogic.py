@@ -3,11 +3,13 @@
 # Filename: marketinglogic.py
 
 import os
+import random
 import re
 import sys
 
 import arrow
 import mysql.connector
+import xlwt
 import yaml
 
 import kits
@@ -137,18 +139,8 @@ class MarketingTracker():
                             }
                             cnx.close()
 
-                            # dealing register info
-                            value = self.get_data_value(sub_job['type'],
-                                                        users)
-                            register_info = {
-                                                'name':     display_name,
-                                                'id':       bind_id,
-                                                'value':    value,
-                                            }
-
                             # add to list
                             self.result['sections'].append(general_info)
-                            self.result['sections'].append(register_info)
 
         return ids
 
@@ -188,6 +180,7 @@ class MarketingTracker():
                                              'name':     sub_job['name'],
                                              'id':       bind_id,
                                              'value':    value,
+                                             'type':     sub_job['type'],
                                          }
                             self.result['sections'].append(stats_info)
 
@@ -201,5 +194,58 @@ class MarketingTracker():
             self.result['err_message'] = err_message
             return self.result
 
-    def get_export_data(self, scope, type, ids):
+    def get_export_data(self, r_scope, r_type, r_format, r_ids):
         try:
+            with open(self.CONFIG_YAML_PATH, encoding='utf-8') as f:
+                yaml_data = yaml.load(f)
+
+                # getting correspoding yaml node
+                for job in yaml_data:
+                    if r_scope in job.keys():
+                        for sub_job in job[r_scope]:
+                            if r_type == sub_job['id']:
+                                section_name = sub_job['db_info']
+                                sql_str = sub_job['mysql']
+                                db_config = kits.get_mysql_config(self.CONFIG_PATH,
+                                                                  section_name)
+                                if db_config is None:
+                                        raise RuntimeError('读取数据库配置失败')
+                                cnx = mysql.connector.connect(**db_config)
+                                cursor = cnx.cursor()
+                                sql_str = sql_str.replace('{ids}',
+                                                          '({0})'
+                                                          ''.format(r_ids))
+                                cursor.execute(sql_str)
+                                res_data = [cursor.column_names]
+                                res_data += cursor.fetchall()
+                                return self.generate_file(r_format, res_data)
+        except:
+            err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
+                                            str(sys.exc_info()[1]))
+            return {'message': err_message}
+
+    def generate_file(self, file_type, data):
+        support_file_type = ('xls')
+        tmp_file_dir = 'static/tmp/'
+        if not os.path.exists(tmp_file_dir):
+            os.makedirs(tmp_file_dir)
+        tmp_file_name = arrow.now('Asia/Shanghai').format('YYYY-DDD')
+
+        if file_type not in support_file_type:
+            raise RuntimeError('目前不支持此格式文件')
+
+        if file_type == 'xls':
+            wb = xlwt.Workbook()
+            wb.encoding = 'gbk'
+            ws = wb.add_sheet('data')
+            for row in range(len(data)):
+                for col in range(len(data[0])):
+                    ws.write(row, col, data[row][col])
+
+            save_file_path = tmp_file_dir + tmp_file_name
+            while os.path.isfile(save_file_path):
+                save_file_path += '-' + str(random.randint(0, 10000))
+            save_file_path += '.' + file_type
+
+            wb.save(save_file_path)
+            return save_file_path

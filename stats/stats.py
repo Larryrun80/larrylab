@@ -1,6 +1,3 @@
-import os
-
-import xlwt
 from flask import Flask, render_template, flash, redirect,\
                   url_for, request, send_file, jsonify
 
@@ -80,10 +77,6 @@ def get_file():
                 'message': "test",
                 'url':  ''
              }
-    tmp_file_dir = 'static/tmp/'
-    tmp_file_name = 'tmp.xls'
-    if not os.path.exists(tmp_file_dir):
-        os.makedirs(tmp_file_dir)
 
     quest_scope = request.form['scope']
     quest_type = request.form['type']
@@ -96,23 +89,20 @@ def get_file():
        not quest_ids:
         result['message'] = '没有获取到正确的下载请求'
         return jsonify(result)
+
+    tracker = marketinglogic.MarketingTracker()
+    file_url = tracker.get_export_data(quest_scope,
+                                       quest_type,
+                                       quest_format,
+                                       quest_ids)
+
+    if isinstance(file_url, str):
+        result['success'] = True
+        result['url'] = file_url
     else:
-        tracker = marketinglogic.MarketingTracker()
-        return_data = tracker.get_export_data(quest_scope,
-                                              quest_type,
-                                              quest_ids)
+        result['message'] = file_url['message']
 
-        if quest_format == 'excel':
-            wb = xlwt.Workbook()
-            wb.encoding = 'gbk'
-            ws = wb.add_sheet('test')
-            ws.write(1, 2, 'yyyyy')
-
-            wb.save(tmp_file_dir + tmp_file_name)
-            result['success'] = True
-            result['url'] = tmp_file_dir + tmp_file_name
-
-        return jsonify(result)
+    return jsonify(result)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
