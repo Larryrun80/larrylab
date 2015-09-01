@@ -200,3 +200,6 @@ class MarketingTracker():
                                             str(sys.exc_info()[1]))
             self.result['err_message'] = err_message
             return self.result
+
+    def get_export_data(self, scope, type, ids):
+        try:

@@ -106,7 +106,7 @@
     $(".download").click(function(){
       $.post( url_get_file,
               {
-                'scope': 'marketing-tracker',
+                'scope': 'user track',
                 'type': $(this).data('type'),
                 'format': $(this).data('format'),
                 'ids': '{{ data["ids"] }}'
