@@ -65,7 +65,6 @@ def track_marketing_via_mobile():
             if not ('success' in data.keys() and data['success']):
                 flash(data['err_message'])
 
-    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 
