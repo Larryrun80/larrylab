@@ -13,7 +13,7 @@
      <!-- Tab panes -->
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane" id="mobiles">
-            <form action="{{ url_for('track_marketing_via_mobile') }}?type=mobiles" method=post>
+            <form action="{{ url_for('track_marketing') }}?type=mobiles" method=post>
                 <div class="form-group">
                     <textarea id="input_mobiles" name="input_mobiles" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['source'] and data['tab'] and data['tab'] == 'mobiles' %}{{ data['source'] }}{% endif %}</textarea>
                     <span id="helpBlock" class="help-block">在上面的文本框中输入需要查询的手机号，手机号之间可以用空格，逗号，或回车分格，请留意一次不要输入过多的（小于10000个）手机号</span>
@@ -52,7 +52,7 @@
         </div>
 
         <div role="tabpanel" class="tab-pane" id="cards">
-             <form action="{{ url_for('track_marketing_via_mobile') }}?type=cards" method=post>
+             <form action="{{ url_for('track_marketing') }}?type=cards" method=post>
                 <div class="form-group">
                     <input id="input_cards" name="input_cards" type="text" class="form-control" placeholder="batch id" value="{% if data and data['source'] and data['tab'] and data['tab'] == 'cards' %}{{ data['source'] }}{% endif %}">
                     <span class="help-block">在上面的文本框中输入充值卡的批次号（batch id）</span>
@@ -91,7 +91,42 @@
         </div>
 
         <div role="tabpanel" class="tab-pane" id="wechat">
-            本功能暂未开通
+            <form action="{{ url_for('track_marketing') }}?type=wechat" method=post>
+                <div class="form-group">
+                    <textarea id="input_wechat" name="input_wechat" rows=10 class="form-control" placeholder="在此输入微信号">{% if data and data['source'] and data['tab'] and data['tab'] == 'wechat' %}{{ data['source'] }}{% endif %}</textarea>
+                    <span id="helpBlock" class="help-block">在上面的文本框中输入需要查询的微信号，注意微信号之间只能用回车分格，请留意一次不要输入过多的（小于10000个）微信号</span>
+                  </div>
+                  <button type="submit" class="btn btn-success btn-block">查询</button>
+                </dl>
+            </form>
+
+        <div class="clearfix" style="margin-bottom: 10px;"></div>
+
+        {% if data and data['success'] and data['sections'] and data['tab'] and data['tab'] == 'wechat' %}
+        <div>
+            <table  class="table table-hover">
+                <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
+                {% for section in data['sections'] %}
+                <tr>
+                    <td>{{ loop.index0 }}</td>
+                    <td>{{ section["name"]|safe }}</td>
+                    <td>{{ section["value"] }}</td>
+                    <td>{% if section["id"] and section["type"] and section["type"] == 'count' %}
+                    <div class="btn-group">
+                      <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        导出明细数据 <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu">
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="###">csv格式</a></li>
+                        <li><a class="download" data-type="{{ section["id"] }}" data-format="xls" href="###">excel格式</a></li>
+                      </ul>
+                    </div>
+                    {% endif %}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
         </div>
       </div>
     </div>

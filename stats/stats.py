@@ -17,6 +17,12 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/test')
+def test():
+    data = [{'id': 1, 'name': 'abc', 'batches': [{'id': 11, 'name': 'abc-1'}, {'id': 12, 'name': 'abc-2'}]}, {'id': 2, 'name': 'def', 'batches': [{'id': 21, 'name': 'xyz-1'}, {'id': 22, 'name': 'xyz-2'}]}]
+    return render_template('test.html', data=data)
+
+
 # 用户统计
 @app.route('/user')
 def show_user_stats():
@@ -43,7 +49,7 @@ def show_order_stats():
 
 # 市场数据追踪
 @app.route('/tm', methods=['GET', 'POST'])
-def track_marketing_via_mobile():
+def track_marketing():
     data = {'title': '查看市场数据'}
     data['tab'] = 'mobiles'
     if request.method == 'POST':
@@ -56,6 +62,8 @@ def track_marketing_via_mobile():
         tracker = marketinglogic.MarketingTracker()
         if req_type == 'mobiles':
             str_source = tracker.get_mobiles(str_source)
+        if req_type == 'wechat':
+            str_source = tracker.get_usernames(str_source)
 
         if len(str_source) == 0:
             flash('未找到任何注册用户')
@@ -65,6 +73,7 @@ def track_marketing_via_mobile():
             if not ('success' in data.keys() and data['success']):
                 flash(data['err_message'])
 
+    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 

@@ -65,6 +65,17 @@ class MarketingTracker():
             res = ', '.join(checked)
         return res
 
+    def get_usernames(self, str_req):
+        str_req = str_req.replace('\r', ',')
+        str_req = str_req.replace('\n', ',')
+        usernames = filter(None, str_req.split(','))
+
+        dealed = []
+        for name in usernames:
+            dealed.append("'{0}'".format(name))
+        print(', '.join(dealed))
+        return ', '.join(dealed)
+
     def get_user_ids(self, str_source, data_type):
         if data_type is None:
             raise RuntimeError('未定义的数据源类型')
@@ -94,6 +105,7 @@ class MarketingTracker():
                             sql_str = sql_str.replace('{source_data}',
                                                       '({0})'
                                                       ''.format(str_source))
+                            print(sql_str)
                             cursor.execute(sql_str)
                             users = cursor.fetchall()
                             if len(users) > 10000:
@@ -125,6 +137,10 @@ class MarketingTracker():
 
                             if data_type == 'mobiles':
                                 general_name = '用户手机信息'
+                                total_user = len(str_source.split(', '))
+
+                            if data_type == 'wechat':
+                                general_name = '微信用户信息'
                                 total_user = len(str_source.split(', '))
 
                             min_r_date = min(r_dates).format('YYYY-MM-DD')
