@@ -73,7 +73,6 @@ def track_marketing():
             if not ('success' in data.keys() and data['success']):
                 flash(data['err_message'])
 
-    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 
