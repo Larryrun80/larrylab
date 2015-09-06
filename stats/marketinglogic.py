@@ -66,6 +66,7 @@ class MarketingTracker():
         return res
 
     def get_usernames(self, str_req):
+        print(str_req)
         str_req = str_req.replace('\r', ',')
         str_req = str_req.replace('\n', ',')
         usernames = filter(None, str_req.split(','))
@@ -73,7 +74,6 @@ class MarketingTracker():
         dealed = []
         for name in usernames:
             dealed.append("'{0}'".format(name))
-        print(', '.join(dealed))
         return ', '.join(dealed)
 
     def get_user_ids(self, str_source, data_type):

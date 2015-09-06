@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+{% block title %} index {% endblock %}
+{% block content %} 
+    <h2>A TEST PAGE</h2>
+    <div class="dropdown">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdown_prepaidcard_campaign" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        选择充值卡批次
+        <span class="caret"></span>
+      </button>
+      <ul id="ul_campaign" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_campaign">
+        {% for d in data %}
+            <li><a id="{{ d['id'] }}" href="###">{{ d['name'] }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="dropdown"  enabled="false">
+      <button class="btn btn-default dropdown-toggle" type="button" id="dropdown_prepaidcard_campaign" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        选择充值卡批次
+        <span class="caret"></span>
+      </button>
+      <ul id="ul_batch" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_campaign">
+        <li><a href='###'>请先选择活动</a></li>
+      </ul>
+    </div>
+
+    <script type="text/javascript">
+    $('#ul_campaign a').click(function(e) {
+      e.preventDefault()
+      var str_li = ''
+      $('#dropdown_prepaidcard_campaign').text($(this).text())
+
+      {% for campaign in data %}
+        if("{{ campaign['id'] }}" == $(this).attr("id")){
+          {% for batch in campaign['batches'] %}
+            str_li += "<li><a href='###''>{{ batch['name'] }}</a></li>"
+          {% endfor %}            
+        }
+      {% endfor %}
+      $('#ul_batch li').remove();
+      $('#ul_batch').append(str_li);
+    });
+    </script>
+{% endblock %}
