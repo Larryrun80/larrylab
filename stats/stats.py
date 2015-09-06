@@ -1,8 +1,14 @@
+import os
+import sys
+
 from flask import Flask, render_template, flash, redirect,\
-                  url_for, request, send_file, jsonify
+                  url_for, request, jsonify
 
 import statslogic
-import marketinglogic
+from basemarketingtracker import MarketingTracker
+from marketingtracker import MobileMarketingTracker,\
+                             CampaignMarketingTracker,\
+                             WechatMarketingTracker
 
 # configuration
 DEBUG = True
@@ -53,26 +59,38 @@ def track_marketing():
     data = {'title': '查看市场数据'}
     data['tab'] = 'mobiles'
     if request.method == 'POST':
-        req_type = request.args.get('type')
-        form_name = 'input_' + req_type
-        str_source = request.form[form_name]
-        data['tab'] = req_type
-        data['source'] = str_source
+        try:
+            req_type = request.args.get('type')
+            form_name = 'input_' + req_type
+            str_source = request.form[form_name]
+            data['tab'] = req_type
+            data['source'] = str_source
 
-        tracker = marketinglogic.MarketingTracker()
-        if req_type == 'mobiles':
-            str_source = tracker.get_mobiles(str_source)
-        if req_type == 'wechat':
-            str_source = tracker.get_usernames(str_source)
+            yaml_path = os.path.abspath(os.path.dirname(__file__))\
+                + '/' + 'conf/marketing.yaml'
+            conf_path = os.path.abspath(os.path.dirname(__file__)) \
+                + '/conf/stats.conf'
 
-        if len(str_source) == 0:
-            flash('未找到任何注册用户')
-        else:
-            m_data = tracker.get_marketing_info(str_source, req_type)
+            if req_type == 'mobiles':
+                tracker = MobileMarketingTracker(yaml_path, conf_path,
+                                                 str_source)
+            if req_type == 'cards':
+                tracker = CampaignMarketingTracker(yaml_path, conf_path,
+                                                   str_source)
+            if req_type == 'wechat':
+                tracker = WechatMarketingTracker(yaml_path, conf_path,
+                                                 str_source)
+
+            m_data = tracker.get_marketing_info()
             data.update(m_data)
             if not ('success' in data.keys() and data['success']):
                 flash(data['err_message'])
+        except:
+            err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
+                                            str(sys.exc_info()[1]))
+            flash(err_message)
 
+    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 
@@ -97,17 +115,22 @@ def get_file():
         result['message'] = '没有获取到正确的下载请求'
         return jsonify(result)
 
-    tracker = marketinglogic.MarketingTracker()
-    file_url = tracker.get_export_data(quest_scope,
-                                       quest_type,
-                                       quest_format,
-                                       quest_ids)
+    yaml_path = os.path.abspath(os.path.dirname(__file__))\
+        + '/' + 'conf/marketing.yaml'
+    conf_path = os.path.abspath(os.path.dirname(__file__)) \
+        + '/conf/stats.conf'
+    f_url = MarketingTracker.get_export_data(quest_scope,
+                                             quest_type,
+                                             quest_format,
+                                             quest_ids,
+                                             yaml_path,
+                                             conf_path)
 
-    if isinstance(file_url, str):
+    if isinstance(f_url, str):
         result['success'] = True
-        result['url'] = file_url
+        result['url'] = f_url
     else:
-        result['message'] = file_url['message']
+        result['message'] = f_url['message']
 
     return jsonify(result)
 
