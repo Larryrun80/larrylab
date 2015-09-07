@@ -57,7 +57,7 @@ def show_order_stats():
 @app.route('/tm', methods=['GET', 'POST'])
 def track_marketing():
     data = {'title': '查看市场数据'}
-    data['tab'] = 'mobiles'
+    data['tab'] = 'Mobile'
     if request.method == 'POST':
         try:
             req_type = request.args.get('type')
@@ -71,16 +71,9 @@ def track_marketing():
             conf_path = os.path.abspath(os.path.dirname(__file__)) \
                 + '/conf/stats.conf'
 
-            if req_type == 'mobiles':
-                tracker = MobileMarketingTracker(yaml_path, conf_path,
-                                                 str_source)
-            if req_type == 'cards':
-                tracker = CampaignMarketingTracker(yaml_path, conf_path,
-                                                   str_source)
-            if req_type == 'wechat':
-                tracker = WechatMarketingTracker(yaml_path, conf_path,
-                                                 str_source)
-
+            # building corresponding class object
+            classname = req_type + 'MarketingTracker'
+            tracker = globals()[classname](yaml_path, conf_path, str_source)
             m_data = tracker.get_marketing_info()
             data.update(m_data)
             if not ('success' in data.keys() and data['success']):
@@ -90,7 +83,6 @@ def track_marketing():
                                             str(sys.exc_info()[1]))
             flash(err_message)
 
-    flash(data)
     return render_template('trackmarketing.html', data=data)
 
 
