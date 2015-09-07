@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title %} {{data["title"]}} {% endblock %}
 {% block content %} 
-    <div class="col-md-8">
+    <div>
       <ul class="nav nav-tabs nav-justified" role="tablist" id="myTabs">
         <li role="presentation"><a href="#Mobile" aria-controls="Mobile" role="tab" data-toggle="tab">用手机号查询</a></li>
         <li role="presentation"><a href="#Campaign" aria-controls="Campaign" role="tab" data-toggle="tab">用兑换码查询</a></li>
@@ -22,97 +22,46 @@
             </form>
         </div>
 
-        <div class="clearfix" style="margin-bottom: 10px;"></div>
-
-        {% if data and data['success'] and data['res_data'] and data['tab'] and data['tab'] == 'Mobile' %}
-        <div>
-            <table  class="table table-hover">
-                <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
-                {% for section in data['res_data'] %}
-                <tr>
-                    <td>{{ loop.index0 }}</td>
-                    <td>{{ section["name"]|safe }}</td>
-                    <td>{{ section["value"] }}</td>
-                    <td>{% if section["id"] and section["type"] and section["type"] == 'count' %}
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        导出明细数据 <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="###">csv格式</a></li>
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="xls" href="###">excel格式</a></li>
-                      </ul>
-                    </div>
-                    {% endif %}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
-
         <div role="tabpanel" class="tab-pane" id="Campaign">
            <form action="{{ url_for('track_marketing') }}?type=Campaign" method=post>
               <div class="form-group">
                   <input id="input_Campaign" name="input_Campaign" type="hidden" class="form-control" placeholder="batch id" value="{% if data and data['source'] and data['tab'] and data['tab'] == 'Campaign' %}{{ data['source'] }}{% endif %}" visiable="false">
                   <span class="help-block">请使用下拉框选择充值卡活动或批次</span>
 
-                  <div class="btn-group">
-                    <button class="btn btn-info btn-block dropdown-toggle" type="button" id="dropdown_prepaidcard_campaign" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                      选择充值卡批次
-                      <span class="caret"></span>
-                    </button>
-                    <ul id="ul_campaign" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_campaign">
-                      {% if data['campaign_info'] %}
-                        {% for campaign in data['campaign_info'] %}
-                            <li><a id="campaign_{{ campaign['id'] }}" data-id="{{ campaign['id'] }}" href="###">{{ campaign['name'] }}</a></li>
-                        {% endfor %}
-                      {% endif %}
-                    </ul>
+                  <div class="row">
+                  <div class="col-md-6">
+                    <div class="dropdown">
+                      <button class="btn btn-info btn-block dropdown-toggle" type="button" id="dropdown_prepaidcard_campaign" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                        选择充值卡活动
+                        <span class="caret"></span>
+                      </button>
+                      <ul id="ul_campaign" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_campaign">
+                        {% if data['campaign_info'] %}
+                          {% for campaign in data['campaign_info'] %}
+                              <li><a id="campaign_{{ campaign['id'] }}" data-id="{{ campaign['id'] }}" href="###">{{ campaign['name'] }}</a></li>
+                          {% endfor %}
+                        {% endif %}
+                      </ul>
+                    </div>
+                    </div>
+                    <div class="col-md-6">
+                    <div class="dropdown">
+                      <button class="btn btn-info btn-block dropdown-toggle" type="button" id="dropdown_prepaidcard_batch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" style="margin-bottom:4px;white-space: normal;">
+                        选择充值卡批次
+                        <span class="caret"></span>
+                      </button>
+                      <ul id="ul_batch" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_batch">
+                        <li><a href='###'>请先选择活动</a></li>
+                      </ul>
+                    </div>
+                    </div>
                   </div>
 
-                  <div class="btn-group">
-                    <button class="btn btn-info btn-block dropdown-toggle" type="button" id="dropdown_prepaidcard_batch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" text-overflow="ellipsis">
-                      选择充值卡批次
-                      <span class="caret"></span>
-                    </button>
-                    <ul id="ul_batch" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_batch">
-                      <li><a href='###'>请先选择活动</a></li>
-                    </ul>
-                  </div>
-
-                <div class="clearfix" style="margin-bottom: 10px;"></div>
+                <div class="clearfix" style="margin-bottom: 20px;"></div>
                 <button type="submit" id="campaign_submit" class="btn btn-success btn-block">查询</button>
               </div>
           </form>
         </div>
-
-        <div class="clearfix" style="margin-bottom: 10px;"></div>
-
-        {% if data and data['success'] and data['res_data'] and data['tab'] and data['tab'] == 'Campaign' %}
-        <div>
-            <table class="table table-hover">
-                <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>
-                {% for section in data['res_data'] %}
-                <tr>
-                    <td>{{ loop.index }}</td>
-                    <td>{{ section["name"]|safe }}</td>
-                    <td>{{ section["value"] }}</td>
-                    <td>{% if section["id"] and section["type"] and section["type"] == 'count' %}
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        导出明细数据 <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu">
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="csv" href="###">csv格式</a></li>
-                        <li><a class="download" data-type="{{ section["id"] }}" data-format="xls" href="###">excel格式</a></li>
-                      </ul>
-                    </div>
-                    {% endif %}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-        {% endif %}
 
         <div role="tabpanel" class="tab-pane" id="Wechat">
             <form action="{{ url_for('track_marketing') }}?type=Wechat" method=post>
@@ -125,9 +74,9 @@
             </form>
         </div>
 
-        <div class="clearfix" style="margin-bottom: 10px;"></div>
+        <div class="clearfix" style="margin-bottom: 20px;"></div>
 
-        {% if data and data['success'] and data['res_data'] and data['tab'] and data['tab'] == 'Wechat' %}
+        {% if data and data['success'] and data['res_data'] %}
         <div>
             <table  class="table table-hover">
                 <tr><th>#</th><th>项目</th><th>结果</th><th>操作</th></tr>

@@ -43,11 +43,15 @@ class MarketingTracker(metaclass=ABCMeta):
         if data_type not in self.AVAILABLE_DATA_TYPE:
             return None
         if data_type == 'count':
-            return len(data)
-        else:
             if len(data) == 0:
-                return 0
-            return data[0][0]
+                return '-'
+            else:
+                return len(data)
+        else:
+            if len(data) == 0 or not data[0][0]:
+                return '-'
+            else:
+                return data[0][0]
 
     def appand_general_info(self, user_data, name, user_amount):
         '''
@@ -107,6 +111,7 @@ class MarketingTracker(metaclass=ABCMeta):
 
                             db_conf = kits.get_mysql_config(self.config_path,
                                                             sub_job['db_info'])
+                            print(sql)
                             user_stats = kits.get_mysql_data(db_conf, sql)
                             value = self.return_stats_value(sub_job['type'],
                                                             user_stats)
