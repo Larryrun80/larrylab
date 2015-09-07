@@ -10,17 +10,17 @@
 
       <div class="clearfix" style="margin-bottom: 30px;"></div>
 
-     <!-- Tab panes -->
+      <!-- Tab panes -->
       <div class="tab-content">
         <div role="tabpanel" class="tab-pane" id="Mobile">
             <form action="{{ url_for('track_marketing') }}?type=Mobile" method=post>
                 <div class="form-group">
                     <textarea id="input_Mobile" name="input_Mobile" rows=10 class="form-control" placeholder="在此输入手机号">{% if data and data['source'] and data['tab'] and data['tab'] == 'Mobile' %}{{ data['source'] }}{% endif %}</textarea>
                     <span id="helpBlock" class="help-block">在上面的文本框中输入需要查询的手机号，手机号之间可以用空格，逗号，或回车分格，请留意一次不要输入过多的（小于10000个）手机号</span>
-                  </div>
-                  <button type="submit" class="btn btn-success btn-block">查询</button>
-                </dl>
+                </div>
+                <button type="submit" class="btn btn-success btn-block">查询</button>
             </form>
+        </div>
 
         <div class="clearfix" style="margin-bottom: 10px;"></div>
 
@@ -49,17 +49,42 @@
             </table>
         </div>
         {% endif %}
-        </div>
 
         <div role="tabpanel" class="tab-pane" id="Campaign">
-             <form action="{{ url_for('track_marketing') }}?type=Campaign" method=post>
-                <div class="form-group">
-                    <input id="input_Campaign" name="input_Campaign" type="text" class="form-control" placeholder="batch id" value="{% if data and data['source'] and data['tab'] and data['tab'] == 'Campaign' %}{{ data['source'] }}{% endif %}">
-                    <span class="help-block">在上面的文本框中输入充值卡的批次号（batch id）</span>
+           <form action="{{ url_for('track_marketing') }}?type=Campaign" method=post>
+              <div class="form-group">
+                  <input id="input_Campaign" name="input_Campaign" type="hidden" class="form-control" placeholder="batch id" value="{% if data and data['source'] and data['tab'] and data['tab'] == 'Campaign' %}{{ data['source'] }}{% endif %}" visiable="false">
+                  <span class="help-block">请使用下拉框选择充值卡活动或批次</span>
+
+                  <div class="btn-group">
+                    <button class="btn btn-info btn-block dropdown-toggle" type="button" id="dropdown_prepaidcard_campaign" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                      选择充值卡批次
+                      <span class="caret"></span>
+                    </button>
+                    <ul id="ul_campaign" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_campaign">
+                      {% if data['campaign_info'] %}
+                        {% for campaign in data['campaign_info'] %}
+                            <li><a id="campaign_{{ campaign['id'] }}" data-id="{{ campaign['id'] }}" href="###">{{ campaign['name'] }}</a></li>
+                        {% endfor %}
+                      {% endif %}
+                    </ul>
                   </div>
-                  <button type="submit" class="btn btn-success btn-block">查询</button>
-                </dl>
-            </form>
+
+                  <div class="btn-group">
+                    <button class="btn btn-info btn-block dropdown-toggle" type="button" id="dropdown_prepaidcard_batch" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" text-overflow="ellipsis">
+                      选择充值卡批次
+                      <span class="caret"></span>
+                    </button>
+                    <ul id="ul_batch" class="dropdown-menu" aria-labelledby="dropdown_prepaidcard_batch">
+                      <li><a href='###'>请先选择活动</a></li>
+                    </ul>
+                  </div>
+
+                <div class="clearfix" style="margin-bottom: 10px;"></div>
+                <button type="submit" id="campaign_submit" class="btn btn-success btn-block">查询</button>
+              </div>
+          </form>
+        </div>
 
         <div class="clearfix" style="margin-bottom: 10px;"></div>
 
@@ -72,7 +97,7 @@
                     <td>{{ loop.index }}</td>
                     <td>{{ section["name"]|safe }}</td>
                     <td>{{ section["value"] }}</td>
-                    <td>{% if section["id"] %}
+                    <td>{% if section["id"] and section["type"] and section["type"] == 'count' %}
                     <div class="btn-group">
                       <button type="button" class="btn btn-success btn-xs dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         导出明细数据 <span class="caret"></span>
@@ -88,7 +113,6 @@
             </table>
         </div>
         {% endif %}
-        </div>
 
         <div role="tabpanel" class="tab-pane" id="Wechat">
             <form action="{{ url_for('track_marketing') }}?type=Wechat" method=post>
@@ -99,6 +123,7 @@
                   <button type="submit" class="btn btn-success btn-block">查询</button>
                 </dl>
             </form>
+        </div>
 
         <div class="clearfix" style="margin-bottom: 10px;"></div>
 
@@ -127,38 +152,92 @@
             </table>
         </div>
         {% endif %}
-        </div>
       </div>
     </div>
 
-    <script type="text/javascript">
-    $('#myTabs a').click(function (e) {
-      e.preventDefault()
-      $(this).tab('show')
-    });
-
-    var url_get_file = "{{ url_for('get_file') }}"
-    $(".download").click(function(){
-      $.post( url_get_file,
-              {
-                'scope': 'user track',
-                'type': $(this).data('type'),
-                'format': $(this).data('format'),
-                'ids': '{{ data["ids"] }}'
-              },
-              function(data) {
-                if (!data.success)
-                  alert(data.message)
-                else {
-                  window.location.href = data.url;
-                }
-              }, "json");
+      <script type="text/javascript">
+      $('#myTabs a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
       });
 
-    var tabhref = "#Mobile"
-    {% if data and data['tab'] %}
-        tabhref = "#{{ data['tab'] }}"
-    {% endif %}
-    $('#myTabs a[href=' + tabhref + ']').tab('show')
-    </script>
+      $('#campaign_submit').click(function (e){
+        if($('#input_Campaign').attr('value') == ''){
+          alert('未选择任何活动');
+          return false;
+        }
+      });
+
+      $('#ul_campaign a').click(function(e) {
+        e.preventDefault()
+        var str_li = ''
+        $('#dropdown_prepaidcard_campaign').html($(this).text()+' &nbsp;<span class="caret"></span>')
+
+        {% if data['campaign_info'] %}
+          {% for campaign in data['campaign_info'] %}
+            if("{{ campaign['id'] }}" == $(this).data("id")){
+              {% for batch in campaign['batches'] %}
+                str_li += "<li><a data-id={{ batch['id'] }} href='###''>{{ batch['name'] }} [{{ batch['quantity'] }}]</a></li>"
+              {% endfor %}            
+            }
+          {% endfor %}
+        {% endif %}
+        $('#ul_batch li').remove();
+        $('#ul_batch').append(str_li);
+        $('#dropdown_prepaidcard_batch').html('选择充值卡批次 &nbsp;<span class="caret"></span>')
+        $('#input_Campaign').attr('value', 'cid='+$(this).data("id"))
+
+        $('#ul_batch a').click(function(e) {
+          e.preventDefault()
+          $('#dropdown_prepaidcard_batch').html($(this).text()+' &nbsp;<span class="caret"></span>')
+          $('#input_Campaign').attr('value', 'bid='+$(this).data("id"))
+        })
+      });
+
+      var url_get_file = "{{ url_for('get_file') }}"
+      $(".download").click(function(){
+        $.post( url_get_file,
+                {
+                  'scope': 'user track',
+                  'type': $(this).data('type'),
+                  'format': $(this).data('format'),
+                  'ids': '{{ data["ids"] }}'
+                },
+                function(data) {
+                  if (!data.success)
+                    alert(data.message)
+                  else {
+                    window.location.href = data.url;
+                  }
+                }, "json");
+        });
+
+      var tabhref = "#Mobile"
+      {% if data and data['tab'] %}
+          tabhref = "#{{ data['tab'] }}"
+      {% endif %}
+      $('#myTabs a[href=' + tabhref + ']').tab('show')
+
+      {% if data and data['source'] and data['tab'] and data['tab'] == 'Campaign' %}
+        {% if data['source'].split('=')[0] == 'cid' %}
+          {% for campaign in  data['campaign_info'] %}
+            {% if campaign['id'] == data['source'].split('=')[1]|int() %}
+              $("#campaign_{{ campaign['id'] }}").click()
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        {% if data['source'].split('=')[0] == 'bid' %}
+          {% for campaign in  data['campaign_info'] %}
+            {% for batch in campaign['batches'] %}
+              {% if batch['id'] == data['source'].split('=')[1]|int() %}
+                $("#campaign_{{ campaign['id'] }}").click()
+                $('#dropdown_prepaidcard_batch').html("{{ batch['name'] }}[{{ batch['quantity'] }}] &nbsp;<span class='caret'></span>")
+                $('#input_Campaign').attr('value', "{{ data['source'] }}")
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
+      </script>
 {% endblock %}

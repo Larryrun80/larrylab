@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 # Filename: basemarketingtracker.py
 
-import arrow
 from abc import ABCMeta, abstractmethod
 import os
 import sys
 
+import arrow
 import mysql.connector
 import yaml
 

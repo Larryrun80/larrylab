@@ -23,12 +23,6 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/test')
-def test():
-    data = [{'id': 1, 'name': 'abc', 'batches': [{'id': 11, 'name': 'abc-1'}, {'id': 12, 'name': 'abc-2'}]}, {'id': 2, 'name': 'def', 'batches': [{'id': 21, 'name': 'xyz-1'}, {'id': 22, 'name': 'xyz-2'}]}]
-    return render_template('test.html', data=data)
-
-
 # 用户统计
 @app.route('/user')
 def show_user_stats():
@@ -56,8 +50,26 @@ def show_order_stats():
 # 市场数据追踪
 @app.route('/tm', methods=['GET', 'POST'])
 def track_marketing():
+    yaml_path = os.path.abspath(os.path.dirname(__file__))\
+        + '/' + 'conf/marketing.yaml'
+    conf_path = os.path.abspath(os.path.dirname(__file__)) \
+        + '/conf/stats.conf'
+    db_conf_name = 'DB_INFO'
+
     data = {'title': '查看市场数据'}
     data['tab'] = 'Mobile'
+    # 装载下拉列表信息
+    try:
+        data['campaign_info'] = CampaignMarketingTracker.get_campaigns(
+                                    yaml_path,
+                                    conf_path,
+                                    db_conf_name,
+                                    6)
+    except:
+        err_message = '{0}: {1}'.format(str(sys.exc_info()[0]),
+                                        str(sys.exc_info()[1]))
+        flash(err_message)
+
     if request.method == 'POST':
         try:
             req_type = request.args.get('type')
